@@ -82,23 +82,46 @@ export class ProductCt {
   static async updateOne(req, res) {
     const { id } = req.params;
     const isValidID = isValidUUID(id);
+
     if (!isValidID) {
       return res.status(400).json({ message: "Not valid Id" });
     }
+
     const isProduct = await ProductMd.getById(id);
+
     if (!isProduct) {
       return res.status(400).json({ message: "Product not found" });
     }
-    // const picture = `${URL}/${req.file.filename}`;
+
     const { name, price, descript, catalog, picture } = req.body;
-    const sanitisedCatalog = typeof catalog === "string" ? [catalog] : catalog;
-    const updateProduct = await ProductMd.updateOne(id, {
-      name,
-      price,
-      descript,
-      catalog: sanitisedCatalog,
-      picture,
-    });
+
+    // Filtrar solo los campos no vacíos
+    const updatedFields = {};
+
+    if (name !== undefined && name !== null && name !== "") {
+      updatedFields.name = name;
+    }
+
+    if (price !== undefined && price !== null && price !== "") {
+      updatedFields.price = price;
+    }
+
+    if (descript !== undefined && descript !== null && descript !== "") {
+      updatedFields.descript = descript;
+    }
+
+    if (catalog !== undefined && catalog !== null && catalog !== "") {
+      const sanitisedCatalog =
+        typeof catalog === "string" ? [catalog] : catalog;
+      updatedFields.catalog = sanitisedCatalog;
+    }
+
+    if (picture !== undefined && picture !== null && picture !== "") {
+      updatedFields.picture = picture;
+    }
+
+    const updateProduct = await ProductMd.updateOne(id, updatedFields);
+
     console.log(`soy yo en update${catalog}`);
     updateProduct
       ? res.status(201).json({ message: "product Updated" })

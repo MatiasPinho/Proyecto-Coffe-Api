@@ -107,7 +107,7 @@ export class ProductMd {
         [name]
       );
     }
-    console.log(result);
+
     return result ? result : null;
   }
   static async updateOne(id, partialProduct) {
